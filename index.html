@@ -3,89 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rebar Tension Pro - Expert Guide Edition</title>
+    <title>Rebar Tension Report - Clean Version</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; padding: 20px; background-color: #f4f7f6; color: #333; }
-        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); max-width: 600px; margin: auto; }
-        h2 { color: #d32f2f; text-align: center; border-bottom: 2px solid #d32f2f; padding-bottom: 10px; margin-top: 0; }
-        h3 { color: #1565c0; border-left: 4px solid #1565c0; padding-left: 10px; margin-top: 25px; font-size: 1.1em; }
-        .input-group { margin-bottom: 15px; }
-        label { display: block; font-weight: bold; margin-bottom: 5px; }
-        input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; box-sizing: border-box; transition: 0.3s; }
-        input:focus { border-color: #1565c0; outline: none; background-color: #e3f2fd; }
-        .axial-input { background-color: #fff9c4; border: 1.5px solid #fbc02d; }
-        .result-section { margin-top: 20px; padding: 15px; background: #eceff1; border-radius: 8px; font-size: 0.95em; }
-        .highlight-box { margin-top: 20px; padding: 20px; background: #e8f5e9; border-radius: 10px; text-align: center; border: 2px solid #4caf50; }
-        .highlight-val { color: #d32f2f; font-weight: bold; font-size: 2em; display: block; margin-top: 5px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; background: white; }
-        th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
-        th { background-color: #f5f5f5; font-size: 0.9em; }
-        .guide-box { margin-top: 25px; padding: 15px; background: #fff; border: 1px dashed #999; border-radius: 8px; font-size: 0.85em; color: #555; }
-        .guide-box ul { padding-left: 20px; }
-        .guide-box li { margin-bottom: 8px; }
-        .warning { color: #d32f2f; font-weight: bold; }
+        body { font-family: 'Sarabun', sans-serif; background-color: #525659; margin: 0; padding: 20px; }
+        
+        .a4-page {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 20mm;
+            margin: auto;
+            background: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            box-sizing: border-box;
+        }
+
+        .no-print-area {
+            max-width: 210mm;
+            margin: 0 auto 20px auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .input-item { flex: 1; min-width: 140px; }
+        label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 5px; color: #333; }
+        input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+
+        .report-header { text-align: center; border-bottom: 3px double #333; margin-bottom: 30px; padding-bottom: 15px; }
+        .report-header h1 { margin: 0; color: #c62828; font-size: 26px; }
+        
+        h3 { border-left: 6px solid #1a237e; padding-left: 12px; margin-top: 30px; font-size: 19px; color: #1a237e; }
+
+        .data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; background: #fcfcfc; padding: 20px; border-radius: 5px; border: 1px solid #eee; }
+        
+        .calc-step { margin-top: 25px; padding-left: 10px; }
+        .formula-box { 
+            font-family: 'Courier New', Courier, monospace; 
+            background: #f1f3f4; 
+            padding: 15px; 
+            display: block; 
+            margin: 10px 0; 
+            font-weight: bold; 
+            color: #0d47a1;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #444; padding: 12px; text-align: center; font-size: 15px; }
+        th { background-color: #f5f5f5; font-weight: bold; }
+
+        .print-btn {
+            background: #2e7d32; color: white; border: none; padding: 12px 25px;
+            border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; font-size: 16px;
+        }
+        .print-btn:hover { background: #1b5e20; }
+
+        @media print {
+            body { background: none; padding: 0; margin: 0; }
+            .no-print-area { display: none; }
+            .a4-page { width: 100%; height: auto; margin: 0; box-shadow: none; padding: 15mm; }
+            @page { size: A4; margin: 0; }
+        }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h2>Rebar Tension Calculator</h2>
+<div class="no-print-area">
+    <div class="input-item"><label>Mu (ton-m/m)</label><input type="number" id="mu" value="8" oninput="calc()"></div>
+    <div class="input-item"><label>Nu (ton/m)</label><input type="number" id="nu" value="0" oninput="calc()"></div>
+    <div class="input-item"><label>d (cm)</label><input type="number" id="d" value="26" oninput="calc()"></div>
+    <div class="input-item"><label>Spacing @ (m)</label><input type="number" id="spacing" value="0.25" step="0.01" oninput="calc()"></div>
+    <button class="print-btn" onclick="window.print()">🖨️ พิมพ์รายงานเป็น PDF (A4)</button>
+</div>
+
+<div class="a4-page">
+    <div class="report-header">
+        <h1>ใบรายการคำนวณแรงดึงในเหล็กเสริม</h1>
+        <div style="font-size: 14px; color: #555; margin-top: 5px;">Reinforced Concrete Tension Analysis</div>
+    </div>
+
+    <h3>1. ข้อมูลการออกแบบ (Design Criteria)</h3>
+    <div class="data-grid">
+        <div>• โมเมนต์ออกแบบ (Mu): <strong><span id="v_mu">8</span> ton-m/m</strong></div>
+        <div>• แรงดึงแนวแกน (Nu): <strong><span id="v_nu">0</span> ton/m</strong></div>
+        <div>• ความลึกประสิทธิผล (d): <strong><span id="v_d">26</span> cm</strong></div>
+        <div>• การจัดเรียงเหล็ก: <strong>เสริมเหล็ก @ <span id="v_spacing">0.25</span> m</strong></div>
+    </div>
+
+    <h3>2. ขั้นตอนการคำนวณ (Calculation Steps)</h3>
     
-    <div class="input-group">
-        <label>1. โมเมนต์เพิ่มค่า Mu (ton-m/m):</label>
-        <input type="number" id="mu" value="8" step="0.1" oninput="calc()">
+    <div class="calc-step">
+        <strong>2.1 ระยะแขนของแรง (Lever Arm, z):</strong>
+        <div class="formula-box">z = 0.9 x d = 0.9 x <span id="c_d1">26</span> = <span id="c_z">23.40</span> cm</div>
     </div>
 
-    <div class="input-group">
-        <label>2. แรงดึงแนวแกนเพิ่มค่า Nu (ton/m):</label>
-        <input type="number" id="nu" value="0" class="axial-input" step="0.1" oninput="calc()">
+    <div class="calc-step">
+        <strong>2.2 แรงดึงจากโมเมนต์ดัด (Tm):</strong>
+        <div class="formula-box">Tm = (Mu x 100,000) / (0.9 x z) = (<span id="c_mu1">8</span> x 100,000) / (0.9 x <span id="c_z1">23.40</span>) = <span id="c_tm">37,987</span> kg/m</div>
     </div>
 
-    <div class="input-group">
-        <label>3. ความลึกประสิทธิผล d (cm):</label>
-        <input type="number" id="d" value="26" step="0.1" oninput="calc()">
+    <div class="calc-step">
+        <strong>2.3 แรงดึงรวมสุทธิ (T total):</strong>
+        <div class="formula-box">T total = Tm + Nu = <span id="c_tm1">37,987</span> + <span id="c_nu1">0</span> = <span id="c_tt">37,987</span> kg/m</div>
     </div>
 
-    <div class="input-group">
-        <label>4. ระยะห่างเหล็กเสริม @ (m):</label>
-        <input type="number" id="spacing" value="0.25" step="0.01" oninput="calc()">
+    <div class="calc-step">
+        <strong>2.4 แรงดึงต่อเหล็ก 1 เส้น (T bar):</strong>
+        <div style="margin-bottom: 5px;">จำนวนเหล็กต่อความกว้าง 1 เมตร = 1 / <span id="c_qty_val">0.25</span> = <span id="c_qty">4.0</span> เส้น</div>
+        <div class="formula-box" style="color: #c62828; font-size: 1.2em; border: 1px solid #c62828;">T bar = <span id="c_tt1">37,987</span> / <span id="c_qty1">4.0</span> = <span id="c_tbar">9,497</span> kg/เส้น</div>
     </div>
 
-    <div class="result-section">
-        <div>แรงดึงจากโมเมนต์ (T_m): <b><span id="outTm">0</span></b> kg/m</div>
-        <div>แรงดึงจากแนวแกน (N_u): <b><span id="outNu">0</span></b> kg/m</div>
-        <div style="font-size: 1.1em; margin-top:5px; color:#1565c0;">แรงดึงรวมสุทธิ: <b><span id="outTotal">0</span></b> kg/m</div>
-    </div>
-
-    <div class="highlight-box">
-        <strong>แรงดึงที่เกิดขึ้นจริงต่อเหล็ก 1 เส้น</strong>
-        <span class="highlight-val"><span id="outTbar">0</span> kg</span>
-    </div>
-
-    <h3>Yield Limit Check (SD40)</h3>
+    <h3>3. ตรวจสอบกำลังวัสดุ (Material Verification)</h3>
     <table>
         <thead>
-            <tr><th>ขนาด</th><th>ลิมิต (kg)</th><th>สถานะ</th></tr>
+            <tr>
+                <th>ขนาดเหล็กเสริม</th>
+                <th>พื้นที่หน้าตัด (cm2)</th>
+                <th>กำลังคราก (fy = 4,000 ksc)</th>
+                <th>สถานะ (Status)</th>
+            </tr>
         </thead>
-        <tbody id="limitBody">
-            <tr id="rowDB12"><td>DB12</td><td>4,520</td><td id="statDB12">-</td></tr>
-            <tr id="rowDB16"><td>DB16</td><td>8,040</td><td id="statDB16">-</td></tr>
-            <tr id="rowDB20"><td>DB20</td><td>12,560</td><td id="statDB20">-</td></tr>
-            <tr id="rowDB25"><td>DB25</td><td>19,640</td><td id="statDB25">-</td></tr>
-        </tbody>
+        <tbody id="resTable"></tbody>
     </table>
 
-    <div class="guide-box">
-        <h3>📖 คำแนะนำการใช้งาน (User Guide)</h3>
-        <ul>
-            <li><b>การกรอก Mu และ Nu:</b> ใช้ค่าแรงที่ผ่านการคูณตัวคูณบรรทุก (Factored Load) มาแล้วตามมาตรฐาน SDM เพื่อความปลอดภัย</li>
-            <li><b>ค่า d (Effective Depth):</b> วัดจากขอบคอนกรีตด้านรับแรงอัดถึงจุดศูนย์กลางเหล็กเสริมแรงดึง (โดยประมาณคือ ความหนาพื้น - 4 ซม.)</li>
-            <li><b>การอ่านผล Status:</b> 
-                <br>- <span style="color:green">PASS</span>: เหล็กขนาดนี้รับแรงดึงได้โดยไม่คราก
-                <br>- <span style="color:red">OVER</span>: <span class="warning">อันตราย!</span> แรงดึงสูงเกินความสามารถเหล็ก ต้องเพิ่มขนาดเหล็กหรือลดระยะ @
-            </li>
-            <li><b>การนำไปเจาะเสียบ (Hilti):</b> นำค่า <b>kg ในช่องเขียว</b> ไประบุเป็นค่าแรงดึงออกแบบในซอฟต์แวร์ Hilti PROFIS หรือเทียบกับตาราง ETA ของ RE500v3</li>
-        </ul>
+    <div style="margin-top: 50px; font-size: 13px; color: #777; text-align: right; border-top: 1px solid #eee; padding-top: 10px;">
+        ออกรายงานโดยโปรแกรมคำนวณวิศวกรรมอัตโนมัติ | วันที่ออกเอกสาร: <span id="dateText"></span>
     </div>
 </div>
 
@@ -95,35 +143,59 @@ function calc() {
     let nu = parseFloat(document.getElementById('nu').value) || 0;
     let d = parseFloat(document.getElementById('d').value) || 0;
     let spacing = parseFloat(document.getElementById('spacing').value) || 0;
-    
+
     let z = 0.9 * d;
-    let tMoment = (z > 0) ? (mu * 100000) / (0.9 * z) : 0;
-    let nTotal = (nu * 1000);
-    let tTotal = tMoment + nTotal;
-    let qty = (spacing > 0) ? 1 / spacing : 0;
-    let tBar = (qty > 0) ? tTotal / qty : 0;
+    let tm = (z > 0) ? (mu * 100000) / (0.9 * z) : 0;
+    let n_kg = nu * 1000;
+    let tt = tm + n_kg;
+    let qty = spacing > 0 ? 1 / spacing : 0;
+    let tbar = qty > 0 ? tt / qty : 0;
 
-    document.getElementById('outTm').innerText = Math.round(tMoment).toLocaleString();
-    document.getElementById('outNu').innerText = Math.round(nTotal).toLocaleString();
-    document.getElementById('outTotal').innerText = Math.round(tTotal).toLocaleString();
-    document.getElementById('outTbar').innerText = Math.round(tBar).toLocaleString();
+    // อัปเดตตัวเลขในหน้าจอ
+    document.getElementById('v_mu').innerText = mu.toLocaleString();
+    document.getElementById('v_nu').innerText = n_kg.toLocaleString();
+    document.getElementById('v_d').innerText = d;
+    document.getElementById('v_spacing').innerText = spacing;
+    
+    document.getElementById('c_d1').innerText = d;
+    document.getElementById('c_z').innerText = z.toFixed(2);
+    document.getElementById('c_mu1').innerText = mu;
+    document.getElementById('c_z1').innerText = z.toFixed(2);
+    document.getElementById('c_tm').innerText = Math.round(tm).toLocaleString();
+    document.getElementById('c_tm1').innerText = Math.round(tm).toLocaleString();
+    document.getElementById('c_nu1').innerText = Math.round(n_kg).toLocaleString();
+    document.getElementById('c_tt').innerText = Math.round(tt).toLocaleString();
+    document.getElementById('c_qty_val').innerText = spacing;
+    document.getElementById('c_qty').innerText = qty.toFixed(1);
+    document.getElementById('c_qty1').innerText = qty.toFixed(1);
+    document.getElementById('c_tt1').innerText = Math.round(tt).toLocaleString();
+    document.getElementById('c_tbar').innerText = Math.round(tbar).toLocaleString();
 
-    updateStatus('statDB12', 'rowDB12', 4520, tBar);
-    updateStatus('statDB16', 'rowDB16', 8040, tBar);
-    updateStatus('statDB20', 'rowDB20', 12560, tBar);
-    updateStatus('statDB25', 'rowDB25', 19640, tBar);
+    // สร้างตารางผลลัพธ์
+    const rebars = [
+        {name: 'DB12', area: 1.13, limit: 4520},
+        {name: 'DB16', area: 2.01, limit: 8040},
+        {name: 'DB20', area: 3.14, limit: 12560},
+        {name: 'DB25', area: 4.91, limit: 19640}
+    ];
+    let rows = "";
+    rebars.forEach(r => {
+        let isPass = tbar <= r.limit;
+        rows += `<tr style="background:${isPass ? 'white' : '#fff5f5'}">
+            <td>${r.name}</td>
+            <td>${r.area}</td>
+            <td>${r.limit.toLocaleString()} kg</td>
+            <td style="color:${isPass ? '#2e7d32' : '#c62828'}; font-weight:bold">${isPass ? 'PASS' : 'OVER'}</td>
+        </tr>`;
+    });
+    document.getElementById('resTable').innerHTML = rows;
 }
 
-function updateStatus(id, rowId, limit, current) {
-    let el = document.getElementById(id);
-    let row = document.getElementById(rowId);
-    if (current > limit) {
-        el.innerText = "OVER"; el.style.color = "red"; row.style.backgroundColor = "#ffebee";
-    } else {
-        el.innerText = "PASS"; el.style.color = "green"; row.style.backgroundColor = "white";
-    }
-}
+// ตั้งค่าวันที่ปัจจุบัน
+document.getElementById('dateText').innerText = new Date().toLocaleDateString('th-TH');
+// รันคำนวณครั้งแรก
 calc();
 </script>
+
 </body>
 </html>
