@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rebar Tension Pro - Structural Tool</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background-color: #f0f2f5; line-height: 1.6; }
+        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); max-width: 500px; margin: auto; }
+        h2 { color: #d32f2f; text-align: center; border-bottom: 2px solid #d32f2f; padding-bottom: 10px; }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; color: #333; }
+        input { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px; background-color: #fffde7; }
+        .result-section { margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border: 1px solid #ddd; }
+        .formula { font-size: 0.85em; color: #666; font-style: italic; margin-bottom: 5px; }
+        .highlight-box { margin-top: 20px; padding: 20px; background: #e8f5e9; border-radius: 8px; text-align: center; border: 2px solid #4caf50; }
+        .highlight-val { color: #d32f2f; font-weight: bold; font-size: 1.8em; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; font-size: 0.9em; }
+        th { background-color: #f4f4f4; }
+        .limit-table h3 { font-size: 1em; color: #d32f2f; margin-top: 20px; }
+        
+        .steps { margin-top: 25px; background: #ffffff; padding: 20px; border-radius: 10px; border: 1px solid #ddd; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>Rebar Tension Calc</h2>
+    
+    <div class="input-group">
+        <label>1. โมเมนต์ Mu (ตัน-เมตร/เมตร):</label>
+        <input type="number" id="mu" value="8" oninput="calc()">
+    </div>
+
+    <div class="input-group">
+        <label>2. ความลึกประสิทธิผล d (cm):</label>
+        <input type="number" id="d" value="26" oninput="calc()">
+    </div>
+
+    <div class="input-group">
+        <label>3. ระยะห่างเหล็กเสริม @ (เมตร):</label>
+        <input type="number" id="spacing" value="0.25" step="0.01" oninput="calc()">
+    </div>
+
+    <div class="result-section">
+        <div class="formula">สูตร: z = 0.9 * d</div>
+        <div>แขนของแรง <b>z</b>: <span id="outZ">23.40</span> cm</div>
+        <hr>
+        <div class="formula">สูตร: T_total = (Mu * 10^5) / (0.9 * z)</div>
+        <div>แรงดึงรวม <b>T_total</b>: <span id="outTotal">37,983</span> kg/m</div>
+        <hr>
+        <div class="formula">สูตร: จำนวนเส้น = 1 / ระยะ@</div>
+        <div>จำนวนเหล็ก: <span id="outQty">4.0</span> เส้น/m</div>
+    </div>
+
+    <div class="highlight-box">
+        <div style="font-weight: bold;">แรงดึงที่เกิดขึ้นจริงต่อเส้น</div>
+        <div class="formula">สูตร: T_bar = T_total / จำนวนเส้น</div>
+        <div class="highlight-val"><span id="outTbar">9,496</span> kg</div>
+    </div>
+
+    <div class="limit-table">
+        <h3>ค่าแรงดึงครากสูงสุดที่ยอมให้ (Yield Limit)</h3>
+        <p class="formula">*คำนวณจาก SD40 (fy = 4,000 ksc)</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>ขนาดเหล็ก</th>
+                    <th>พื้นที่ (cm²)</th>
+                    <th>T_yield (kg)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr id="rowDB12"><td>DB12</td><td>1.13</td><td>4,520</td></tr>
+                <tr id="rowDB16"><td>DB16</td><td>2.01</td><td>8,040</td></tr>
+                <tr id="rowDB20"><td>DB20</td><td>3.14</td><td>12,560</td></tr>
+                <tr id="rowDB25"><td>DB25</td><td>4.91</td><td>19,640</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="steps">
+        <h3>วิธีการนำไปใช้งาน (Step-by-Step)</h3>
+        <ol>
+            <li><b>Check Capacity:</b> ดูว่าค่า T_bar (สีแดงด้านบน) ต้องไม่เกินค่า T_yield ในตารางของเหล็กที่คุณใช้</li>
+            <li><b>Hilti Data:</b> นำค่า T_bar ไปเปิดตาราง Hilti RE500v3 เพื่อหาความลึกเจาะฝัง ($h_{ef}$)</li>
+            <li><b>Site Prep:</b> สแกนหาเหล็กเดิมในคาน เจาะรู และทำความสะอาดรู (เป่า-ขัด-เป่า)</li>
+            <li><b>Injection:</b> ฉีดน้ำยาจากก้นรูและเสียบเหล็กทันที</li>
+        </ol>
+    </div>
+</div>
+
+<script>
+function calc() {
+    let mu = parseFloat(document.getElementById('mu').value) || 0;
+    let d = parseFloat(document.getElementById('d').value) || 0;
+    let spacing = parseFloat(document.getElementById('spacing').value) || 0;
+    
+    let z = 0.9 * d;
+    let tTotal = (z > 0) ? (mu * 100000) / (0.9 * z) : 0;
+    let qty = (spacing > 0) ? 1 / spacing : 0;
+    let tBar = (qty > 0) ? tTotal / qty : 0;
+
+    document.getElementById('outZ').innerText = z.toFixed(2);
+    document.getElementById('outTotal').innerText = Math.round(tTotal).toLocaleString();
+    document.getElementById('outQty').innerText = qty.toFixed(1);
+    document.getElementById('outTbar').innerText = Math.round(tBar).toLocaleString();
+
+    // Highlight row if T_bar exceeds limit
+    checkLimit('rowDB12', 4520, tBar);
+    checkLimit('rowDB16', 8040, tBar);
+    checkLimit('rowDB20', 12560, tBar);
+    checkLimit('rowDB25', 19640, tBar);
+}
+
+function checkLimit(rowId, limit, current) {
+    let el = document.getElementById(rowId);
+    if (current > limit) {
+        el.style.backgroundColor = "#ffcdd2"; // Red background if over limit
+        el.style.color = "#b71c1c";
+    } else {
+        el.style.backgroundColor = "white";
+        el.style.color = "black";
+    }
+}
+</script>
+
+</body>
+</html>
