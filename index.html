@@ -3,146 +3,157 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rebar Tension Report - Professional Formula</title>
+    <title>Rebar & Hilti RE500V3 Design Report</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Sarabun', sans-serif; background-color: #525659; margin: 0; padding: 20px; }
-        .a4-page { width: 210mm; min-height: 297mm; padding: 20mm; margin: auto; background: white; box-shadow: 0 0 10px rgba(0,0,0,0.5); box-sizing: border-box; }
+        .a4-page { width: 210mm; min-height: 297mm; padding: 20mm; margin: 20px auto; background: white; box-shadow: 0 0 10px rgba(0,0,0,0.5); box-sizing: border-box; page-break-after: always; }
         .no-print-area { max-width: 210mm; margin: 0 auto 20px auto; background: #fff; padding: 20px; border-radius: 8px; display: flex; gap: 15px; flex-wrap: wrap; }
         .input-item { flex: 1; min-width: 140px; }
         label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 5px; }
-        input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
-        .report-header { text-align: center; border-bottom: 3px double #333; margin-bottom: 30px; padding-bottom: 15px; }
-        .report-header h1 { margin: 0; color: #c62828; font-size: 26px; }
-        h3 { border-left: 6px solid #1a237e; padding-left: 12px; margin-top: 30px; font-size: 19px; color: #1a237e; }
-        .data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; background: #fcfcfc; padding: 20px; border: 1px solid #eee; }
-        .calc-step { margin-top: 25px; padding-left: 10px; }
-        .formula-line { font-family: 'Courier New', Courier, monospace; font-weight: bold; color: #0d47a1; font-size: 16px; margin: 5px 0; }
-        .substitution-line { font-family: 'Courier New', Courier, monospace; color: #555; font-size: 15px; margin-bottom: 15px; padding-left: 20px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #444; padding: 12px; text-align: center; font-size: 15px; }
-        th { background-color: #f5f5f5; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        .report-header { text-align: center; border-bottom: 3px double #333; margin-bottom: 25px; padding-bottom: 15px; }
+        .report-header h1 { margin: 0; color: #c62828; font-size: 24px; }
+        h3 { border-left: 6px solid #1a237e; padding-left: 12px; margin-top: 25px; font-size: 18px; color: #1a237e; border-bottom: 1px solid #eee; }
+        .formula-line { font-family: 'Courier New', monospace; font-weight: bold; color: #0d47a1; font-size: 15px; margin: 5px 0; }
+        .sub-line { font-family: 'Courier New', monospace; color: #444; font-size: 14px; margin-bottom: 10px; padding-left: 20px; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        th, td { border: 1px solid #444; padding: 10px; text-align: center; font-size: 14px; }
+        .step-box { border: 1px solid #ddd; padding: 15px; border-radius: 5px; background: #fafafa; }
+        .highlight-row { background-color: #e3f2fd !important; font-weight: bold; }
         .print-btn { background: #2e7d32; color: white; border: none; padding: 12px 25px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; font-size: 16px; }
-        @media print { body { background: none; padding: 0; margin: 0; } .no-print-area { display: none; } .a4-page { width: 100%; height: auto; margin: 0; box-shadow: none; padding: 15mm; } @page { size: A4; margin: 0; } }
+        @media print { body { background: none; padding: 0; } .no-print-area { display: none; } .a4-page { width: 100%; box-shadow: none; padding: 15mm; margin:0; } }
     </style>
 </head>
 <body>
 
 <div class="no-print-area">
-    <div class="input-item"><label>Mu (ton-m/m)</label><input type="number" id="mu" value="8" oninput="calc()"></div>
-    <div class="input-item"><label>Nu (ton/m)</label><input type="number" id="nu" value="0" oninput="calc()"></div>
-    <div class="input-item"><label>d (cm)</label><input type="number" id="d" value="26" oninput="calc()"></div>
-    <div class="input-item"><label>Spacing @ (m)</label><input type="number" id="spacing" value="0.25" step="0.01" oninput="calc()"></div>
-    <button class="print-btn" onclick="window.print()">🖨️ พิมพ์รายงานเป็น PDF (A4)</button>
+    <div class="input-item"><label>Mu (ton-m/m)</label><input type="number" id="mu" value="8" oninput="runAll()"></div>
+    <div class="input-item"><label>Nu (ton/m)</label><input type="number" id="nu" value="0" oninput="runAll()"></div>
+    <div class="input-item"><label>d (cm)</label><input type="number" id="d" value="26" oninput="runAll()"></div>
+    <div class="input-item"><label>Spacing @ (m)</label><input type="number" id="spacing" value="0.25" step="0.01" oninput="runAll()"></div>
+    <div class="input-item">
+        <label>ขนาดเหล็กเสริม (Rebar)</label>
+        <select id="rebarSize" onchange="runAll()">
+            <option value="12">DB12</option>
+            <option value="16">DB16</option>
+            <option value="20" selected>DB20</option>
+            <option value="25">DB25</option>
+        </select>
+    </div>
+    <button class="print-btn" onclick="window.print()">🖨️ พิมพ์รายงาน (PDF)</button>
 </div>
 
 <div class="a4-page">
-    <div class="report-header">
-        <h1>ใบรายการคำนวณแรงดึงในเหล็กเสริม</h1>
-        <div style="font-size: 14px; color: #555; margin-top: 5px;">Structural Design Report - Strength Design Method</div>
+    <div class="report-header"><h1>รายการคำนวณแรงดึงและการตรวจสอบเหล็ก</h1></div>
+    <h3>1. ข้อมูลนำเข้า (Input Data)</h3>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; padding:15px; background:#f9f9f9; border: 1px solid #ddd;">
+        <div>โมเมนต์ (Mu): <b><span id="p1_mu"></span> t-m/m</b></div>
+        <div>แรงดึงแนวแกน (Nu): <b><span id="p1_nu"></span> t/m</b></div>
+        <div>ความลึกประสิทธิผล (d): <b><span id="p1_d"></span> cm</b></div>
+        <div>การจัดเหล็ก: <b>DB<span id="p1_size"></span> @ <span id="p1_spacing"></span> m</b></div>
     </div>
-
-    <h3>1. ข้อมูลการออกแบบ (Design Criteria)</h3>
-    <div class="data-grid">
-        <div>• โมเมนต์ออกแบบ (Mu): <strong><span id="v_mu">8</span> ton-m/m</strong></div>
-        <div>• แรงดึงแนวแกน (Nu): <strong><span id="v_nu">0</span> ton/m</strong></div>
-        <div>• ความลึกประสิทธิผล (d): <strong><span id="v_d">26</span> cm</strong></div>
-        <div>• ระยะห่างเหล็กเสริม (@): <strong><span id="v_spacing">0.25</span> m</strong></div>
-    </div>
-
-    <h3>2. ขั้นตอนการคำนวณ (Calculation Steps)</h3>
-    
+    <h3>2. การคำนวณแรงดึง (Calculation)</h3>
     <div class="calc-step">
-        <strong>2.1 คำนวณระยะแขนของแรง (Lever Arm, z):</strong>
-        <div class="formula-line">สูตร: z = 0.9 x d</div>
-        <div class="substitution-line">แทนค่า: z = 0.9 x <span id="c_d1">26</span> = <strong><span id="c_z">23.40</span> cm</strong></div>
+        <div class="formula-line">1) z = 0.9 x d = 0.9 x <span id="p1_c_d"></span> = <b><span id="p1_c_z"></span> cm</b></div>
+        <div class="formula-line">2) Tm = (Mu x 10^5) / (0.9 x z) = <span id="p1_c_tm"></span> kg/m</div>
+        <div class="formula-line">3) T bar = (Tm + Nu) / (1 / spacing) = <b style="color:red;"><span id="p1_c_tbar"></span> kg/เส้น</b></div>
     </div>
-
-    <div class="calc-step">
-        <strong>2.2 คำนวณแรงดึงจากโมเมนต์ดัด (Tm):</strong>
-        <div class="formula-line">สูตร: Tm = (Mu x 100,000) / (phi x z)</div>
-        <div class="substitution-line">แทนค่า: Tm = (<span id="c_mu1">8</span> x 100,000) / (0.9 x <span id="c_z1">23.40</span>) = <strong><span id="c_tm">37,987</span> kg/m</strong></div>
-    </div>
-
-    <div class="calc-step">
-        <strong>2.3 คำนวณแรงดึงรวมสุทธิ (T total):</strong>
-        <div class="formula-line">สูตร: T total = Tm + (Nu x 1,000)</div>
-        <div class="substitution-line">แทนค่า: T total = <span id="c_tm1">37,987</span> + (<span id="c_nu1">0</span> x 1,000) = <strong><span id="c_tt">37,987</span> kg/m</strong></div>
-    </div>
-
-    <div class="calc-step">
-        <strong>2.4 คำนวณแรงดึงต่อเหล็ก 1 เส้น (T bar):</strong>
-        <div class="formula-line">สูตร: T bar = T total / (1 / spacing)</div>
-        <div class="substitution-line">แทนค่า: T bar = <span id="c_tt1">37,987</span> / (1 / <span id="c_spacing1">0.25</span>) = <strong style="color: #c62828; font-size: 1.2em;"><span id="c_tbar">9,497</span> kg/เส้น</strong></div>
-    </div>
-
-    <h3>3. การตรวจสอบความปลอดภัย (Safety Verification)</h3>
+    <h3>3. ตารางตรวจสอบ Rebar</h3>
     <table>
-        <thead>
-            <tr>
-                <th>ขนาดเหล็ก</th>
-                <th>หน้าตัด (cm2)</th>
-                <th>แรงดึงยอมให้ (Yield)</th>
-                <th>ผลการทดสอบ</th>
-            </tr>
-        </thead>
-        <tbody id="resTable"></tbody>
+        <thead><tr><th>ขนาด</th><th>พื้นที่ (cm2)</th><th>Capacity (kg)</th><th>แรงดึงจริง</th><th>สถานะ</th></tr></thead>
+        <tbody id="rebarBody"></tbody>
     </table>
+</div>
 
-    <div style="margin-top: 50px; font-size: 13px; color: #777; text-align: right; border-top: 1px solid #eee; padding-top: 10px;">
-        รายการคำนวณทางวิศวกรรม | วันที่ออกเอกสาร: <span id="dateText"></span>
+<div class="a4-page">
+    <div class="report-header"><h1>รายละเอียดระยะเจาะฝังและการติดตั้ง</h1></div>
+    <h3>4. การคำนวณระยะฝัง (Embedment Depth Analysis)</h3>
+    <div class="calc-step">
+        <p>วิเคราะห์สำหรับ <b>Hilti HIT-RE 500 V3</b> ในคอนกรีตร้าว</p>
+        <div class="formula-line">4.1 ตามแรงยึดเกาะ (Bond Strength):</div>
+        <div class="sub-line">
+            f_bd = 100 kg/cm² | เส้นผ่านศูนย์กลาง (d_b) = <span id="p2_dia_text"></span> cm<br>
+            h_ef = T_bar / (pi x d_b x f_bd) = <span id="p2_tbar_val"></span> / (3.14 x <span id="p2_dia_val"></span> x 100)<br>
+            ระยะฝังคำนวณ: <b><span id="p2_hef_calc"></span> cm</b>
+        </div>
+        <div class="formula-line">4.2 ตามเกณฑ์ขั้นต่ำ (Min. 12d_b):</div>
+        <div class="sub-line">h_min = 12 x <span id="p2_dia_val2"></span> = <b><span id="p2_min_hef"></span> cm</b></div>
+    </div>
+    <h3>5. ขั้นตอนติดตั้งหน้างาน (Step-by-Step)</h3>
+    <div class="step-box">
+        <p>1. <b>เจาะรู:</b> ใช้ดอกสว่าน <b><span id="p2_bit"></span> mm</b> ลึก <b><span id="p2_final_h"></span> cm</b></p>
+        <p>2. <b>ทำความสะอาด:</b> เป่า 2 / ขัด 2 / เป่า 2 (มาตรฐาน Hilti)</p>
+        <p>3. <b>ฉีดน้ำยา:</b> ฉีดจากก้นรูขึ้นมา 2/3 ของความลึก</p>
+        <p>4. <b>ติดตั้ง:</b> หมุนเหล็กเข้าไปจนสุดรู และทิ้งไว้ให้แห้งตามเวลา Curing</p>
+    </div>
+    <div style="margin-top:20px; text-align:center; padding:20px; border:3px solid #d32f2f; background:#fff9c4; font-size:24px;">
+        <b>ระยะเจาะฝังที่แนะนำ: <span id="p2_final_h2"></span> cm</b>
     </div>
 </div>
 
 <script>
-function calc() {
-    let mu = parseFloat(document.getElementById('mu').value) || 0;
-    let nu = parseFloat(document.getElementById('nu').value) || 0;
-    let d = parseFloat(document.getElementById('d').value) || 0;
-    let spacing = parseFloat(document.getElementById('spacing').value) || 0;
+function runAll() {
+    const mu = parseFloat(document.getElementById('mu').value) || 0;
+    const nu = parseFloat(document.getElementById('nu').value) || 0;
+    const d = parseFloat(document.getElementById('d').value) || 0;
+    const spacing = parseFloat(document.getElementById('spacing').value) || 0;
+    const selectedSize = parseInt(document.getElementById('rebarSize').value);
 
-    let z = 0.9 * d;
-    let tm = (z > 0) ? (mu * 100000) / (0.9 * z) : 0;
-    let n_kg = nu * 1000;
-    let tt = tm + n_kg;
-    let qty = spacing > 0 ? 1 / spacing : 0;
-    let tbar = qty > 0 ? tt / qty : 0;
+    // Calc Page 1
+    const z = 0.9 * d;
+    const tm = (z > 0) ? (mu * 100000) / (0.9 * z) : 0;
+    const t_total = tm + (nu * 1000);
+    const qty_bar = spacing > 0 ? 1/spacing : 0;
+    const t_bar = qty_bar > 0 ? t_total / qty_bar : 0;
 
-    document.getElementById('v_mu').innerText = mu.toLocaleString();
-    document.getElementById('v_nu').innerText = nu.toLocaleString();
-    document.getElementById('v_d').innerText = d;
-    document.getElementById('v_spacing').innerText = spacing;
-    
-    document.getElementById('c_d1').innerText = d;
-    document.getElementById('c_z').innerText = z.toFixed(2);
-    document.getElementById('c_mu1').innerText = mu;
-    document.getElementById('c_z1').innerText = z.toFixed(2);
-    document.getElementById('c_tm').innerText = Math.round(tm).toLocaleString();
-    document.getElementById('c_tm1').innerText = Math.round(tm).toLocaleString();
-    document.getElementById('c_nu1').innerText = nu;
-    document.getElementById('c_tt').innerText = Math.round(tt).toLocaleString();
-    document.getElementById('c_spacing1').innerText = spacing;
-    document.getElementById('c_tt1').innerText = Math.round(tt).toLocaleString();
-    document.getElementById('c_tbar').innerText = Math.round(tbar).toLocaleString();
+    // Update Page 1 UI
+    document.getElementById('p1_mu').innerText = mu;
+    document.getElementById('p1_nu').innerText = nu;
+    document.getElementById('p1_d').innerText = d;
+    document.getElementById('p1_size').innerText = selectedSize;
+    document.getElementById('p1_spacing').innerText = spacing;
+    document.getElementById('p1_c_d').innerText = d;
+    document.getElementById('p1_c_z').innerText = z.toFixed(2);
+    document.getElementById('p1_c_tm').innerText = Math.round(tm).toLocaleString();
+    document.getElementById('p1_c_tbar').innerText = Math.round(t_bar).toLocaleString();
 
+    // Rebar Table
     const rebars = [
-        {name: 'DB12', area: 1.13, limit: 4520},
-        {name: 'DB16', area: 2.01, limit: 8040},
-        {name: 'DB20', area: 3.14, limit: 12560},
-        {name: 'DB25', area: 4.91, limit: 19640}
+        {name: 'DB12', area: 1.13, cap: 4520, d: 1.2},
+        {name: 'DB16', area: 2.01, cap: 8040, d: 1.6},
+        {name: 'DB20', area: 3.14, cap: 12560, d: 2.0},
+        {name: 'DB25', area: 4.91, cap: 19640, d: 2.5}
     ];
     let rows = "";
     rebars.forEach(r => {
-        let isPass = tbar <= r.limit;
-        rows += `<tr style="background:${isPass ? 'white' : '#fff5f5'}">
-            <td>${r.name}</td><td>${r.area}</td><td>${r.limit.toLocaleString()} kg</td>
-            <td style="color:${isPass ? '#2e7d32' : '#c62828'}; font-weight:bold">${isPass ? 'PASS' : 'OVER'}</td>
-        </tr>`;
+        let isPass = t_bar <= r.cap;
+        let isSel = selectedSize == (r.d * 10);
+        rows += `<tr class="${isSel ? 'highlight-row' : ''}">
+            <td>${r.name}</td><td>${r.area}</td><td>${r.cap.toLocaleString()}</td>
+            <td>${Math.round(t_bar).toLocaleString()}</td>
+            <td style="color:${isPass?'green':'red'}">${isPass?'PASS':'OVER'}</td></tr>`;
     });
-    document.getElementById('resTable').innerHTML = rows;
+    document.getElementById('rebarBody').innerHTML = rows;
+
+    // Calc Page 2 (Dynamic by Selected Size)
+    const dia_cm = selectedSize / 10;
+    const hef_calc = t_bar / (Math.PI * dia_cm * 100);
+    const hef_min = selectedSize * 1.2;
+    const final_h = Math.max(hef_calc * 1.3, hef_min, 15); // Factor 1.3 for safety
+
+    document.getElementById('p2_dia_text').innerText = dia_cm.toFixed(1);
+    document.getElementById('p2_tbar_val').innerText = Math.round(t_bar).toLocaleString();
+    document.getElementById('p2_dia_val').innerText = dia_cm.toFixed(1);
+    document.getElementById('p2_hef_calc').innerText = hef_calc.toFixed(2);
+    document.getElementById('p2_dia_val2').innerText = dia_cm.toFixed(1);
+    document.getElementById('p2_min_hef').innerText = hef_min.toFixed(1);
+    
+    document.getElementById('p2_bit').innerText = selectedSize + 4; // ดอกสว่าน = เหล็ก + 4mm
+    document.getElementById('p2_final_h').innerText = Math.ceil(final_h);
+    document.getElementById('p2_final_h2').innerText = Math.ceil(final_h);
 }
-document.getElementById('dateText').innerText = new Date().toLocaleDateString('th-TH');
-calc();
+runAll();
 </script>
 </body>
 </html>
